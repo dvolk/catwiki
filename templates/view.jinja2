@@ -1,0 +1,35 @@
+{% extends 'base.jinja2' %}
+
+{% block style %}
+  .truncate {
+  width: 250px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  }
+{% endblock %}
+
+{% block content %}
+  <header class="w3-container w3-indigo">
+    <h2>{{ page_title|capitalize }} &nbsp;<a href={{ url_for('edit', page_title=page_title) }}>{{ icon('edit') }}</a> {% if page_title != "index" %}<a href="{{ url_for('index') }}">{{ icon('home') }}</a>{% endif %} <a href="{{ url_for('recent_changes') }}">{{ icon('calendar') }}</a></h2>
+  </header>
+
+  <div class="w3-container w3-panel w3-white">
+    <p>
+{{ to_md(p.content) }}
+    </p>
+  </div>
+
+{% endblock %}
+
+{% block script %}
+// add w3 table classes to markdown generated tables
+window.onload = function() {
+    var tables = document.getElementsByTagName("table"),
+    len = tables !== null ? tables.length : 0,
+    i = 0;
+    for(i; i < len; i++) {
+        tables[i].className += " w3-table w3-border w3-hoverable w3-bordered"; 
+    }
+}
+{% endblock %}

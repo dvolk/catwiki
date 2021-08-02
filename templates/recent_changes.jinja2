@@ -1,0 +1,36 @@
+{% extends 'base.jinja2' %}
+
+{% block style %}
+  .truncate {
+  width: 250px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  }
+{% endblock %}
+
+{% block content %}
+  <header class="w3-container w3-indigo">
+    <h2><a href="{{ url_for('view', page_title='index') }}">{{ icon('arrow-left') }}</a> Recent changes</h2>
+  </header>
+
+  <div class="w3-container w3-panel w3-white">
+    <p>
+      <table class="w3-table">
+	<thead>
+	  <th>Title</th>
+	  <th>Modified</th>
+	</thead>
+	<tbody>
+	  {% for page in pages %}
+	    <tr>
+	      <td><a href="{{ url_for('view', page_title=page.title) }}">{{ page.title|capitalize }}</a></td>
+	      <td>{{ nice_time(page.modified_epochtime) }}</td>
+	    </tr>
+	  {% endfor %}
+	</tbody>
+      </table>
+    </p>
+  </div>
+
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends 'base.jinja2' %}
+
+{% block style %}
+  .truncate {
+  width: 250px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  }
+{% endblock %}
+
+{% block content %}
+  <header class="w3-container w3-indigo">
+    <h2><a href="{{ url_for('view', page_title=page_title) }}">{{ icon('arrow-left') }}</a> Edit {{ page_title|capitalize }}</h2>
+  </header>
+
+  {% if form.errors %}
+    <div class="w3-container w3-panel w3-pale-red">
+      <ul class="w3-ul">
+	{% for field_name, field_errors in form.errors|dictsort if field_errors %}
+          {% for error in field_errors %}
+            <li>{{ form[field_name].label }}: {{ error }}</li>
+          {% endfor %}
+	{% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  <div class="w3-container w3-panel w3-pale-yellow">
+    <p>
+      <form method="POST">
+	{% set f = form.content.process_data(p.content) %}
+	{{ form.csrf_token }}
+	<p>
+	  {{ form.title(class="w3-input", value=page_title) }}
+	</p>
+	<p>
+	  {{ form.content(class="w3-input", rows="25") }}
+	</p>
+	<p>
+	  <button class="w3-input w3-blue">Save</button>
+	</p>
+      </form>
+    </p>
+  </div>
+
+{% endblock %}
