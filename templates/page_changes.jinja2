@@ -11,7 +11,7 @@
 
 {% block content %}
   <header class="w3-container w3-indigo">
-    <h2><a href="{{ url_for('view', page_title='index') }}">{{ icon('arrow-left') }}</a> Page changes</h2>
+    <h2><a href="{{ url_for('view', page_title=page_title) }}">{{ icon('arrow-left') }}</a> Changes for {{ page_title }}</h2>
   </header>
 
   <div class="w3-container w3-panel w3-white">
@@ -19,13 +19,14 @@
       <table class="w3-table w3-bordered">
 	<thead>
 	  <tr>
-	    <th width="80%">Change</th>
 	    <th width="20%">Time</th>
+	    <th width="80%">Change</th>
 	  </tr>
 	</thead>
 	<tbody>
 	  {%- for change in changes.items %}
 	    <tr>
+	      <td>{{ nice_time(change.diff_epochtime) }}</td>
 	      <td>
 		{%- for line in change.diff_str.split("\n")[3:] if line and line|length > 1 %}
 		  {%- if line[0] == "+" %}
@@ -37,7 +38,6 @@
 		  {% endif %}
 		{%- endfor %}
 	      </td>
-	      <td>{{ nice_time(change.diff_epochtime) }}</td>
 	    </tr>
 	  {%- endfor %}
 	</tbody>
