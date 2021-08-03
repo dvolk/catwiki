@@ -1,0 +1,63 @@
+{% extends 'base.jinja2' %}
+
+{% block style %}
+  .truncate {
+  width: 250px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  }
+{% endblock %}
+
+{% block content %}
+  <header class="w3-container w3-indigo">
+    <h2><a href="{{ url_for('view', page_title='index') }}">{{ icon('arrow-left') }}</a> Page changes</h2>
+  </header>
+
+  <div class="w3-container w3-panel w3-white">
+    <p>
+      <table class="w3-table w3-bordered">
+	<thead>
+	  <tr>
+	    <th width="80%">Title</th>
+	    <th width="20%">Modified</th>
+	  </tr>
+	</thead>
+	<tbody>
+	  {%- for change in changes.items %}
+	    <tr>
+	      <td>
+		{%- for line in change.diff_str.split("\n")[3:] if line and line|length > 1 %}
+		  {%- if line[0] == "+" %}
+		    <span class="w3-pale-green">{{ line }}</span>
+		    <br/>
+		  {%- elif line[0] == "-" %}
+		    <span class="w3-pale-red">{{ line }}</span>
+		    <br/>
+		  {% endif %}
+		{%- endfor %}
+	      </td>
+	      <td>{{ nice_time(change.diff_epochtime) }}</td>
+	    </tr>
+	  {%- endfor %}
+	</tbody>
+      </table>
+    </p>
+
+    <p>
+      Pages:
+      {% for page in changes.iter_pages() %}
+	{% if page %}
+	  {% if page != changes.page %}
+            <a href="{{ url_for('page_changes', page_title=page_title, page=page) }}">{{ page }}</a>
+	  {% else %}
+            <strong>{{ page }}</strong>
+	  {% endif %}
+	{% else %}
+	  <span class=ellipsis>…</span>
+	{% endif %}
+      {% endfor %}
+    </p>
+  </div>
+
+{% endblock %}

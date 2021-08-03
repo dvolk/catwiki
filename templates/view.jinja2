@@ -11,7 +11,7 @@
 
 {% block content %}
   <header class="w3-container w3-indigo">
-    <h2>{{ page_title|capitalize }} &nbsp;<a href={{ url_for('edit', page_title=page_title) }}>{{ icon('edit') }}</a> {% if page_title != "index" %}<a href="{{ url_for('index') }}">{{ icon('home') }}</a>{% endif %} <a href="{{ url_for('recent_changes') }}">{{ icon('calendar') }}</a></h2>
+    <h2>{{ page_title|capitalize }} &nbsp;<a href={{ url_for('edit', page_title=page_title) }}>{{ icon('edit') }}</a> {% if page_title != "index" %}<a href="{{ url_for('index') }}">{{ icon('home') }}</a>{% endif %}  <a href="{{ url_for('page_changes', page=1, page_title=page_title) }}">{{ icon('line-chart') }}</a> <a href="{{ url_for('recent_changes') }}">{{ icon('calendar') }}</a></h2>
   </header>
 
   <div class="w3-container w3-panel w3-white">

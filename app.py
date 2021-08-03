@@ -1,21 +1,18 @@
 import datetime as dt
-import logging
-import subprocess
+import difflib
 import time
-from pathlib import Path
 
 import argh
 import flask
-import git
+import flask_mongoengine as fm
 import humanize
-from flask_mongoengine import *
 
 import to_md
 
 app = flask.Flask(__name__)
 app.secret_key = "secret"
 app.config["MONGODB_DB"] = "catwiki-1"
-db = MongoEngine(app)
+db = fm.MongoEngine(app)
 
 
 class Page(db.Document):
@@ -25,11 +22,17 @@ class Page(db.Document):
     modified_epochtime = db.IntField(default=0)
 
 
+class Change(db.Document):
+    page_id = db.ReferenceField(Page)
+    diff_str = db.StringField()
+    diff_epochtime = db.IntField()
+
+
 def icon(name):
     return f'<i class="fa fa-{name} fa-fw"></i>'
 
 
-PageForm = wtf.model_form(Page)
+PageForm = fm.wtf.model_form(Page)
 
 
 @app.context_processor
@@ -62,14 +65,30 @@ def edit(page_title):
     p = Page.objects(title=page_title).first()
     if flask.request.method == "POST" and form.validate():
         if p:
+            old_content = p.content
+            new_content = form.content.data.replace("\r", "")
+            if old_content == new_content:
+                return flask.redirect(flask.url_for("view", page_title=page_title))
             p.title = form.title.data
-            p.content = form.content.data
+            p.content = new_content
             p.modified_epochtime = int(time.time())
         else:
-            p = Page(title=form.title.data, content=form.content.data)
+            old_content = str()
+            new_content = form.content.data.replace("\r", "\n")
+            p = Page(title=form.title.data, content=new_content)
             p.modified_epochtime = int(time.time())
             p.created_epochtime = int(time.time())
+
+        new_diff = [x.strip() for x in new_content.split("\n")]
+        old_diff = [x.strip() for x in old_content.split("\n")]
+        print(new_diff, old_diff)
         p.save()
+        change = Change(
+            page_id=p.id,
+            diff_str="\n".join(difflib.unified_diff(old_diff, new_diff, lineterm="")),
+            diff_epochtime=int(time.time()),
+        )
+        change.save()
         return flask.redirect(flask.url_for("view", page_title=page_title))
     else:
         return flask.render_template(
@@ -94,8 +113,30 @@ def recent_changes():
     )
 
 
+@app.route("/page_changes/<page_title>/<page>")
+def page_changes(page_title, page):
+    time_now = int(time.time())
+
+    def nice_time(t2):
+        return humanize.naturaltime(dt.timedelta(seconds=(time_now - t2))).capitalize()
+
+    page_id = Page.objects(title=page_title).first_or_404().id
+    changes = (
+        Change.objects(page_id=page_id)
+        .order_by("-diff_epochtime")
+        .paginate(page=int(page), per_page=10)
+    )
+    return flask.render_template(
+        "page_changes.jinja2",
+        changes=changes,
+        nice_time=nice_time,
+        page=int(page),
+        page_title=page_title,
+    )
+
+
 def main():
-    app.run(port=7755, debug=True)
+    app.run(host="0", port=7755, debug=True)
 
 
 if __name__ == "__main__":
