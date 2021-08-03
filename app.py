@@ -132,6 +132,7 @@ def page_changes(page_title, page):
         nice_time=nice_time,
         page=int(page),
         page_title=page_title,
+        title="Changes for " + page_title,
     )
 
 
