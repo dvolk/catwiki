@@ -74,7 +74,7 @@ def edit(page_title):
             p.modified_epochtime = int(time.time())
         else:
             old_content = str()
-            new_content = form.content.data.replace("\r", "\n")
+            new_content = form.content.data.replace("\r", "")
             p = Page(title=form.title.data, content=new_content)
             p.modified_epochtime = int(time.time())
             p.created_epochtime = int(time.time())
