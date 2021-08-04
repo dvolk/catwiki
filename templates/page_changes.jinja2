@@ -15,6 +15,21 @@
   </header>
 
   <div class="w3-container w3-panel w3-white">
+  <p>
+    Pages:
+    {% for page in changes.iter_pages() %}
+      {% if page %}
+	{% if page != changes.page %}
+          <a href="{{ url_for('page_changes', page_title=page_title, page=page) }}">{{ page }}</a>
+	{% else %}
+          <strong>{{ page }}</strong>
+	{% endif %}
+      {% else %}
+	<span class=ellipsis>…</span>
+      {% endif %}
+    {% endfor %}
+  </p>
+
     <p>
       <table class="w3-table w3-bordered">
 	<thead>
@@ -44,20 +59,6 @@
       </table>
     </p>
 
-    <p>
-      Pages:
-      {% for page in changes.iter_pages() %}
-	{% if page %}
-	  {% if page != changes.page %}
-            <a href="{{ url_for('page_changes', page_title=page_title, page=page) }}">{{ page }}</a>
-	  {% else %}
-            <strong>{{ page }}</strong>
-	  {% endif %}
-	{% else %}
-	  <span class=ellipsis>…</span>
-	{% endif %}
-      {% endfor %}
-    </p>
   </div>
 
 {% endblock %}
