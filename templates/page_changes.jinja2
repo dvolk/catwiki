@@ -45,10 +45,10 @@
 	      <td>
 		{%- for line in change.diff_str.split("\n")[3:] if line and line|length > 1 %}
 		  {%- if line[0] == "+" %}
-		    <span class="w3-pale-green">{{ line[1:] }}</span>
+		    <span class="w3-pale-green">{{ line[1:]|e }}</span>
 		    <br/>
 		  {%- elif line[0] == "-" %}
-		    <span class="w3-pale-red">{{ line[1:] }}</span>
+		    <span class="w3-pale-red">{{ line[1:]|e }}</span>
 		    <br/>
 		  {% endif %}
 		{%- endfor %}
